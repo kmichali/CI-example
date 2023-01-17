@@ -1,0 +1,106 @@
+Byte-size RSE: Continuous Integration - session notes
+
+Activity
+
+Useful links:
+https://github.com/UNIVERSE-HPC/ci-example - example GitHub repository we'll use for the activity
+Our first workflow - the first workflow we will write, as a reference
+Our workflow containing a matrix - the second workflow, containing a build matrix that will run our unit tests over multiple operating system and Python languages
+
+
+Notes
+GitHub Actions workflows need to be located within a particular directory in the repository: .github/workflows/
+
+More in-depth material for after the session:
+Automating Unit Testing with Continuous Integration - a tutorial that demonstrates how to use GitHub Actions to automated some unit tests written using Pytest, as well as how to scale your platform testing using build matrices
+GitHub's introduction to YAML - a comprehensive introduction to YAML for the purposes of using it to define GitHub Actions workflows
+GitHub Actions documentation
+GitHub Actions Marketplace - a directory which contains many "actions" you can use in your workflows, including many third-party ones
+
+
+
+Session commands overview:
+
+Create a virtual environment in your ci-example directory:
+
+python -m venv env  (create a virtual environment within your ci-example directory)
+source ./env/bin/activate   (activate the virtual environment - you should see the prompt change to show (env) at the start…
+Once you’ve activated the environment, Steve showed that you can check that it’s an empty environment with hardly any packages installed using the “pip list” command.
+Then we installed “pytest” to be able to run the tests:
+pip install pytest
+After running pip install pytest, if it completes successfully, the command pytest will be be available and you can then run the tests…
+python -m pytest -v tests/test_factorial.py
+
+
+
+Within GitHub, we’re now creating a new file to setup our CI workflow  (we also checked in Settings -> Actions -> General that “Allow all actions and reusable workflows” is enabled
+
+We create a file called main.yml in ci-example/.github/workflows    (in the front page of the ci-example github repository, click “Add file” and the “Create new file”. For the file name, type .github/workflows/main.yml
+
+File content: (there is currently a bug in the file below that needs fixing…)
+There are issues with the font/spacing/tabs in Docs - you can look at the original file here: https://github.com/steve-crouch/ci-example/blob/main/.github/workflows/main.yml 
+
+name: run-unit-tests
+
+on: push
+
+jobs:
+
+  build:
+ 
+	runs-on: ubuntu-latest
+    
+	steps:
+    
+	- name: Checkout repository
+  	uses: actions/checkout@v3
+ 	 
+	- name: Set up Python 3.10
+  	uses: actions/setup-python@v4
+  	with:
+    	python-version: "3.10"
+   	 
+	- name: Install Python dependencies
+  	run: |
+    	python3 -m pip install --upgrade pip
+    	pip3 install -r requirements.txt
+   	 
+	- name: Test with pytest
+  	run: |
+    	python3 -m pytest -v tests/test_factorial.py
+
+Now we commit this file into our repository:
+At the bottom of the page, add a description - e.g.  “workflow configuration for CI” then with commit directly to main branch selected, you can commit the file.
+
+If the contents of your file is correct, GitHub will detect the file and should run the CI pipeline straight away
+
+Once the main.yml file is committed, you can click the “Actions” link on the link bar at the top of the GitHub page and this will show you whether your pipeline has run and whether it has been successful. You can then look into the details showing the steps that were run and, if something fails, you can hopefully see the cause.
+
+Adding a CI matrix:
+We’ve now moved on to look at expanding our CI pipeline to include a build matrix. In this example we’ve showed how to add, with a small amount of extra text in our main.yml file, runs of our CI workflow for three different Python versions across 3 different operating systems. This is hugely powerful and we get all this extra functionality with only a very small addition to our YAML file.
+
+https://github.com/steve-crouch/ci-example/blob/main/.github/workflows/main.yml - this is a final verison of the YAML file containing the matrix additions.
+
+
+Q&A
+
+Add any questions you have below
+
+Question: How can we work around the differences between using GitHub Actions for CI/CD in repos that we own vs. GitHub repos in an organisation (apparently tokens and Actions work differently - speaking from XP trying to set them up for an org and it just not working)  
+Add any answers/comments…
+Add any answers/comments…
+Question: How difficult is it to set up the same software environment in the CI workflow compared to what I’m using on my workstation or the HPC cluster? Is there a way better than using containers (since the software I’m using is ideally optimised for the CPUs it’ll be used on)?
+…
+Beware: actions by default get WRITE permissions to your repo, which you probably do NOT want. You should explicitly only give it read permissions, see https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
+Question: Add your question here
+Add any answers/comments…
+Add any answers/comments…
+Question: Add your question here
+Add any answers/comments…
+Add any answers/comments…
+
+Post-session Survey
+We're very keen to know what you think about this session! Please fill in a brief survey: https://docs.google.com/forms/d/e/1FAIpQLSfZgvlq4wqV86I0tLQkcgkGUWuCGOrom10nSV9kli-rj5j0Nw/viewform
+
+Status badges:
+https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/adding-a-workflow-status-badge
