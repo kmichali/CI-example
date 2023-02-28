@@ -32,8 +32,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         python3 -m pip install --upgrade pip
-        pip3 install pylint
         pip3 install -r requirements.txt
+        pip3 install pylint
         
     - name: Test with pytest
       run: |
@@ -41,5 +41,5 @@ jobs:
         
     - name: Run Pylint
       run: | 
-      pylint --reports y --fail-under 7 mymath
+        pylint --reports y --fail-under 7 mymath
       
